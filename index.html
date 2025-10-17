@@ -6,152 +6,120 @@
   <style>
     body {
       font-family: Arial;
-      background: #f8f9fa;
+      background: #fafafa;
       text-align: center;
       margin: 0;
       padding: 20px;
     }
-
     h1 { margin-bottom: 10px; }
-
     #calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
       gap: 10px;
       justify-items: center;
     }
-
     .day {
+      width: 80px;
+      height: 80px;
       background: white;
-      border-radius: 12px;
+      border-radius: 10px;
       box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      width: 120px;
-      padding: 5px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      cursor: pointer;
       transition: 0.2s;
     }
-
-    .day:hover { transform: scale(1.03); }
-
-    .userRow {
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      width: 100%;
-      margin-bottom: 3px;
-    }
-
-    .userLabel {
-      font-size: 12px;
-    }
-
+    .day:hover { transform: scale(1.05); }
     .icons {
       display: flex;
-      gap: 5px;
-      font-size: 22px;
+      gap: 3px;
+      font-size: 24px;
     }
-
-    .clicked-blue { filter: drop-shadow(0 0 4px #007bff); }
-    .clicked-pink { filter: drop-shadow(0 0 4px #e83e8c); }
-
-    #controls {
-      margin-bottom: 20px;
-    }
-
+    .clicked-blue { filter: drop-shadow(0 0 4px #00f); }
+    .clicked-pink { filter: drop-shadow(0 0 4px #f0c); }
+    #controls { margin-bottom: 15px; }
     button {
       margin: 5px;
       padding: 5px 10px;
       cursor: pointer;
-      border-radius: 5px;
-      border: none;
-      background-color: #007bff;
-      color: white;
-    }
-
-    button.pink {
-      background-color: #e83e8c;
-    }
-
-    small {
-      font-size: 12px;
-      color: #555;
     }
   </style>
 </head>
 <body>
   <h1>Reto en Pareja 💙💖</h1>
-
+  <div id="controls">
+    <button onclick="changeUser('blue')">💙 Benito</button>
+    <button onclick="changeUser('pink')">💖 Ella</button>
+  </div>
   <div id="calendar"></div>
 
   <!-- Firebase -->
   <script type="module">
+    // Importar SDK
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
-    // 🔧 Configura con tus datos de Firebase
+    // 🔧 CONFIGURACIÓN (reemplázala con la tuya)
     const firebaseConfig = {
-        apiKey: "AIzaSyAuq6Dm4P989aa_63PFcCYHPVpsF7gnpiA",
-        authDomain: "reto-calendario.firebaseapp.com",
-        projectId: "reto-calendario",
-        storageBucket: "reto-calendario.firebasestorage.app",
-        messagingSenderId: "1012712540953",
-        appId: "1:1012712540953:web:c329e1b5f002a6a7e2d388",
-        measurementId: "G-928B2T1JRG"
+      apiKey: "AIzaSyAuq6Dm4P989aa_63PFcCYHPVpsF7gnpiA",
+      authDomain: "reto-calendario.firebaseapp.com",
+      projectId: "reto-calendario",
+      storageBucket: "reto-calendario.firebasestorage.app",
+      messagingSenderId: "1012712540953",
+      appId: "1:1012712540953:web:c329e1b5f002a6a7e2d388",
+      measurementId: "G-928B2T1JRG"
     };
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
     const calendar = document.getElementById("calendar");
-    const emojis = ["🏃‍♂️", "🍽️", "💧"];
-    const users = [
-      { id: "blue", name: "Servel 💙" },
-      { id: "pink", name: "Carmen 💖" }
-    ];
+    let currentUser = "blue"; // por defecto
 
-    // Crear los días del mes
+    const emojis = ["🏃‍♂️","🍽️","💧"];
+
+    // Crear calendario (ejemplo: 31 días)
     for (let i = 1; i <= 31; i++) {
       const dayDiv = document.createElement("div");
       dayDiv.className = "day";
       dayDiv.innerHTML = `
-        ${users.map(u => `
-          <div class="userRow" id="row-${u.id}-${i}">
-            <div class="userLabel">${u.name}</div>
-            <div class="icons">
-              ${emojis.map((e, idx) => `<span id="d${i}-${idx}-${u.id}">${e}</span>`).join("")}
-            </div>
-          </div>
-        `).join("")}
+        <div class="icons" id="icons-${i}">
+          ${emojis.map((e, idx) => `
+            <span id="d${i}-${idx}-b">${e}</span>
+            <span id="d${i}-${idx}-p">${e}</span>
+          `).join("")}
+        </div>
         <small>${i}</small>
       `;
       calendar.appendChild(dayDiv);
     }
 
-    // Escuchar la base de datos
+    // Escuchar cambios en la base de datos
     const dataRef = ref(db, "reto");
     onValue(dataRef, snapshot => {
       const data = snapshot.val() || {};
       document.querySelectorAll("span").forEach(span => {
-        span.classList.remove("clicked-blue", "clicked-pink");
+        span.classList.remove("clicked-blue","clicked-pink");
       });
       for (const key in data) {
-        const color = data[key];
-        const el = document.getElementById(key);
-        if (el) el.classList.add(color === "blue" ? "clicked-blue" : "clicked-pink");
+        if (data[key] === "blue") document.getElementById(key)?.classList.add("clicked-blue");
+        if (data[key] === "pink") document.getElementById(key)?.classList.add("clicked-pink");
       }
     });
 
-    // Evento de clic para marcar íconos
+    // Manejar clics
     document.querySelectorAll("span").forEach(span => {
       span.addEventListener("click", () => {
-        const id = span.id;
-        const userColor = id.includes("-blue") ? "blue" : "pink";
-        set(ref(db, "reto/" + id), userColor);
+        set(ref(db, "reto/" + span.id), currentUser);
       });
     });
+
+    function changeUser(user) {
+      currentUser = user;
+      alert(`Ahora estás marcando como ${user === "blue" ? "💙 Servel" : "💖 Carmen"}`);
+    }
   </script>
 </body>
 </html>
