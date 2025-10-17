@@ -219,6 +219,134 @@ document.getElementById('next').addEventListener('click', () => {
 renderCalendar();
 </script>
 
+  <!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reto en Pareja 💙💖</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #fafafa;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 10px; }
+    #calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 10px;
+      justify-items: center;
+    }
+    .day {
+      width: 80px;
+      height: 80px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 0 5px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .day:hover { transform: scale(1.05); }
+    .icons {
+      display: flex;
+      gap: 3px;
+      font-size: 24px;
+    }
+    .clicked-blue { filter: drop-shadow(0 0 4px #00f); }
+    .clicked-pink { filter: drop-shadow(0 0 4px #f0c); }
+    #controls { margin-bottom: 15px; }
+    button {
+      margin: 5px;
+      padding: 5px 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>Reto en Pareja 💙💖</h1>
+  <div id="controls">
+    <button onclick="changeUser('blue')">💙 Benito</button>
+    <button onclick="changeUser('pink')">💖 Ella</button>
+  </div>
+  <div id="calendar"></div>
+
+  <!-- Firebase -->
+  <script type="module">
+    // Importar SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+    // 🔧 CONFIGURACIÓN (reemplázala con la tuya)
+    const firebaseConfig = {
+        apiKey: "AIzaSyAuq6Dm4P989aa_63PFcCYHPVpsF7gnpiA",
+        authDomain: "reto-calendario.firebaseapp.com",
+        projectId: "reto-calendario",
+        storageBucket: "reto-calendario.firebasestorage.app",
+        messagingSenderId: "1012712540953",
+        appId: "1:1012712540953:web:c329e1b5f002a6a7e2d388",
+        measurementId: "G-928B2T1JRG"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    const calendar = document.getElementById("calendar");
+    let currentUser = "blue"; // por defecto
+
+    const emojis = ["🏃‍♂️","🍽️","💧"];
+
+    // Crear calendario (ejemplo: 31 días)
+    for (let i = 1; i <= 31; i++) {
+      const dayDiv = document.createElement("div");
+      dayDiv.className = "day";
+      dayDiv.innerHTML = `
+        <div class="icons" id="icons-${i}">
+          ${emojis.map((e, idx) => `
+            <span id="d${i}-${idx}-b">${e}</span>
+            <span id="d${i}-${idx}-p">${e}</span>
+          `).join("")}
+        </div>
+        <small>${i}</small>
+      `;
+      calendar.appendChild(dayDiv);
+    }
+
+    // Escuchar cambios en la base de datos
+    const dataRef = ref(db, "reto");
+    onValue(dataRef, snapshot => {
+      const data = snapshot.val() || {};
+      document.querySelectorAll("span").forEach(span => {
+        span.classList.remove("clicked-blue","clicked-pink");
+      });
+      for (const key in data) {
+        if (data[key] === "blue") document.getElementById(key)?.classList.add("clicked-blue");
+        if (data[key] === "pink") document.getElementById(key)?.classList.add("clicked-pink");
+      }
+    });
+
+    // Manejar clics
+    document.querySelectorAll("span").forEach(span => {
+      span.addEventListener("click", () => {
+        set(ref(db, "reto/" + span.id), currentUser);
+      });
+    });
+
+    function changeUser(user) {
+      currentUser = user;
+      alert(`Ahora estás marcando como ${user === "blue" ? "💙 Benito" : "💖 Ella"}`);
+    }
+  </script>
+</body>
+</html>
+
+
 </body>
 
 </html>
+
