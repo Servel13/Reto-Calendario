@@ -105,8 +105,8 @@
 <div id="calendar" class="calendar"></div>
 
 <div class="counters">
-  <div>💙 <b>Benito</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span></div>
-  <div>💖 <b>Ella</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span></div>
+  <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span></div>
+  <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span></div>
 </div>
 
 <script>
@@ -128,13 +128,13 @@ function renderCalendar() {
     div.className = 'day';
     div.innerHTML = `
       <div class="day-number">${d}</div>
-      <div class="row-label">💙 Benito</div>
+      <div class="row-label">💙 Servel</div>
       <div class="icons" data-person="b" data-day="${d}">
         <span data-type="exercise">🏃‍♂️</span>
         <span data-type="food">🍽️</span>
         <span data-type="water">💧</span>
       </div>
-      <div class="row-label">💖 Ella</div>
+      <div class="row-label">💖 Carmen</div>
       <div class="icons" data-person="g" data-day="${d}">
         <span data-type="exercise">🏃‍♀️</span>
         <span data-type="food">🍽️</span>
@@ -220,4 +220,5 @@ renderCalendar();
 </script>
 
 </body>
+
 </html>
