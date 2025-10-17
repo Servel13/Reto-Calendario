@@ -2,124 +2,231 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Reto en Pareja 💙💖</title>
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+
   <style>
     body {
-      font-family: Arial;
+      font-family: 'Poppins', sans-serif;
       background: #fafafa;
       text-align: center;
       margin: 0;
-      padding: 20px;
+      padding: 0;
     }
-    h1 { margin-bottom: 10px; }
-    #calendar {
+    h1 {
+      margin-top: 20px;
+    }
+    .month-nav {
+      margin: 10px 0;
+    }
+    .month-nav button {
+      padding: 8px 14px;
+      margin: 0 5px;
+      border: none;
+      border-radius: 10px;
+      background: #444;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      gap: 10px;
-      justify-items: center;
+      max-width: 900px;
+      margin: 20px auto;
+      gap: 8px;
     }
     .day {
-      width: 80px;
-      height: 80px;
+      border: 1px solid #ccc;
+      border-radius: 12px;
+      padding: 6px;
       background: white;
-      border-radius: 10px;
-      box-shadow: 0 0 5px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      transition: 0.2s;
+      min-height: 90px;
+      box-shadow: 0 0 5px #ddd;
     }
-    .day:hover { transform: scale(1.05); }
+    .day-number {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 2px;
+    }
     .icons {
       display: flex;
-      gap: 3px;
-      font-size: 24px;
+      justify-content: center;
+      gap: 6px;
+      font-size: 22px;
+      margin-top: 4px;
     }
-    .clicked-blue { filter: drop-shadow(0 0 4px #00f); }
-    .clicked-pink { filter: drop-shadow(0 0 4px #f0c); }
-    #controls { margin-bottom: 15px; }
-    button {
-      margin: 5px;
-      padding: 5px 10px;
+    .row-label {
+      font-size: 10px;
+      color: #888;
+    }
+    .icons span {
       cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s;
+      border-radius: 50%;
+      padding: 4px;
+    }
+    .icons span:hover {
+      transform: scale(1.2);
+    }
+    .active-blue {
+      background-color: rgba(0, 100, 255, 0.25);
+      box-shadow: 0 0 6px rgba(0, 100, 255, 0.5);
+    }
+    .active-pink {
+      background-color: rgba(255, 20, 147, 0.25);
+      box-shadow: 0 0 6px rgba(255, 20, 147, 0.5);
+    }
+    .counters {
+      margin: 20px auto;
+      max-width: 600px;
+      background: white;
+      padding: 15px;
+      border-radius: 15px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    .counters div {
+      margin: 5px 0;
+      font-size: 16px;
     }
   </style>
 </head>
 <body>
-  <h1>Reto en Pareja 💙💖</h1>
-  <div id="controls">
-    <button onclick="changeUser('blue')">💙 Benito</button>
-    <button onclick="changeUser('pink')">💖 Ella</button>
-  </div>
-  <div id="calendar"></div>
 
-  <!-- Firebase -->
-  <script type="module">
-    // Importar SDK
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+<h1>💪 Reto en Pareja — Octubre / Noviembre / Diciembre</h1>
 
-    // 🔧 CONFIGURACIÓN (reemplázala con la tuya)
-    const firebaseConfig = {
-      apiKey: "AIzaSyAuq6Dm4P989aa_63PFcCYHPVpsF7gnpiA",
-      authDomain: "reto-calendario.firebaseapp.com",
-      projectId: "reto-calendario",
-      storageBucket: "reto-calendario.firebasestorage.app",
-      messagingSenderId: "1012712540953",
-      appId: "1:1012712540953:web:c329e1b5f002a6a7e2d388",
-      measurementId: "G-928B2T1JRG"
+<div class="month-nav">
+  <button id="prev">⬅️</button>
+  <span id="monthName" style="font-weight:bold; font-size:18px;"></span>
+  <button id="next">➡️</button>
+</div>
+
+<div id="calendar" class="calendar"></div>
+
+<div class="counters">
+  <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span></div>
+  <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span></div>
+</div>
+
+<script type="module">
+  // Import Firebase (usando ES Modules)
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+  import { getDatabase, ref, get, set, remove, child, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+
+  // Configuración Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAuq6Dm4P989aa_63PFcCYHPVpsF7gnpiA",
+    authDomain: "reto-calendario.firebaseapp.com",
+    projectId: "reto-calendario",
+    storageBucket: "reto-calendario.appspot.com",
+    messagingSenderId: "1012712540953",
+    appId: "1:1012712540953:web:c329e1b5f002a6a7e2d388",
+    measurementId: "G-928B2T1JRG"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const months = [
+    { name: "Octubre", days: 31 },
+    { name: "Noviembre", days: 30 },
+    { name: "Diciembre", days: 31 }
+  ];
+  let currentMonth = 0;
+
+  const calendar = document.getElementById('calendar');
+  const monthName = document.getElementById('monthName');
+
+  function renderCalendar() {
+    monthName.textContent = months[currentMonth].name;
+    calendar.innerHTML = '';
+    for (let d = 1; d <= months[currentMonth].days; d++) {
+      const div = document.createElement('div');
+      div.className = 'day';
+      div.innerHTML = `
+        <div class="day-number">${d}</div>
+        <div class="row-label">💙 Benito</div>
+        <div class="icons" data-person="b" data-day="${d}">
+          <span data-type="exercise">🏃‍♂️</span>
+          <span data-type="food">🍽️</span>
+          <span data-type="water">💧</span>
+        </div>
+        <div class="row-label">💖 Ella</div>
+        <div class="icons" data-person="g" data-day="${d}">
+          <span data-type="exercise">🏃‍♀️</span>
+          <span data-type="food">🍽️</span>
+          <span data-type="water">💧</span>
+        </div>`;
+      calendar.appendChild(div);
+    }
+    loadProgress();
+    addClickHandlers();
+  }
+
+  function addClickHandlers() {
+    calendar.querySelectorAll('.icons span').forEach(icon => {
+      icon.addEventListener('click', async () => {
+        const parent = icon.parentElement;
+        const person = parent.dataset.person;
+        const day = parent.dataset.day;
+        const type = icon.dataset.type;
+        const colorClass = person === 'b' ? 'active-blue' : 'active-pink';
+        const keyPath = `users/${months[currentMonth].name}/${person}/days/${day}/${type}`;
+        const iconRef = ref(db, keyPath);
+
+        const snapshot = await get(iconRef);
+        const isActive = snapshot.exists() && snapshot.val().active;
+
+        if (isActive) {
+          icon.classList.remove(colorClass);
+          await remove(iconRef);
+        } else {
+          icon.classList.add(colorClass);
+          await set(iconRef, { active: true });
+        }
+
+        updateCounters();
+      });
+    });
+  }
+
+  async function updateCounters() {
+    const bPath = ref(db, `users/${months[currentMonth].name}/b/days`);
+    const gPath = ref(db, `users/${months[currentMonth].name}/g/days`);
+    const counters = {
+      b: { exercise: 0, food: 0, water: 0 },
+      g: { exercise: 0, food: 0, water: 0 }
     };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
+    const [bSnap, gSnap] = await Promise.all([get(bPath), get(gPath)]);
 
-    const calendar = document.getElementById("calendar");
-    let currentUser = "blue"; // por defecto
-
-    const emojis = ["🏃‍♂️","🍽️","💧"];
-
-    // Crear calendario (ejemplo: 31 días)
-    for (let i = 1; i <= 31; i++) {
-      const dayDiv = document.createElement("div");
-      dayDiv.className = "day";
-      dayDiv.innerHTML = `
-        <div class="icons" id="icons-${i}">
-          ${emojis.map((e, idx) => `
-            <span id="d${i}-${idx}-b">${e}</span>
-            <span id="d${i}-${idx}-p">${e}</span>
-          `).join("")}
-        </div>
-        <small>${i}</small>
-      `;
-      calendar.appendChild(dayDiv);
+    if (bSnap.exists()) {
+      bSnap.forEach(day => {
+        day.forEach(type => {
+          if (type.val().active) {
+            counters.b[type.key]++;
+          }
+        });
+      });
     }
 
-    // Escuchar cambios en la base de datos
-    const dataRef = ref(db, "reto");
-    onValue(dataRef, snapshot => {
-      const data = snapshot.val() || {};
-      document.querySelectorAll("span").forEach(span => {
-        span.classList.remove("clicked-blue","clicked-pink");
+    if (gSnap.exists()) {
+      gSnap.forEach(day => {
+        day.forEach(type => {
+          if (type.val().active) {
+            counters.g[type.key]++;
+          }
+        });
       });
-      for (const key in data) {
-        if (data[key] === "blue") document.getElementById(key)?.classList.add("clicked-blue");
-        if (data[key] === "pink") document.getElementById(key)?.classList.add("clicked-pink");
-      }
-    });
-
-    // Manejar clics
-    document.querySelectorAll("span").forEach(span => {
-      span.addEventListener("click", () => {
-        set(ref(db, "reto/" + span.id), currentUser);
-      });
-    });
-
-    function changeUser(user) {
-      currentUser = user;
-      alert(`Ahora estás marcando como ${user === "blue" ? "💙 Servel" : "💖 Carmen"}`);
     }
-  </script>
-</body>
-</html>
+
+    document.getElementById('b-ex').textContent = counters.b.exercise;
+    document.getElementById('b-food').textContent = counters.b.food;
+    document.getElementById('b-water').textContent = counters.b.water;
+
+    document.getElementById('g-ex').textContent = counters.g.exercise;
+    document.getElementById('
