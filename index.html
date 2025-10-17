@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reto en Pareja 💙💖</title>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <!-- Firebase SDK (compatibilidad con navegadores sin módulos) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
   <style>
     body {
@@ -96,137 +96,160 @@
   </style>
 </head>
 <body>
+  <h1>💪 Reto en Pareja — Octubre / Noviembre / Diciembre</h1>
 
-<h1>💪 Reto en Pareja — Octubre / Noviembre / Diciembre</h1>
+  <div class="month-nav">
+    <button id="prev">⬅️</button>
+    <span id="monthName" style="font-weight:bold; font-size:18px;"></span>
+    <button id="next">➡️</button>
+  </div>
 
-<div class="month-nav">
-  <button id="prev">⬅️</button>
-  <span id="monthName" style="font-weight:bold; font-size:18px;"></span>
-  <button id="next">➡️</button>
-</div>
+  <div id="calendar" class="calendar"></div>
 
-<div id="calendar" class="calendar"></div>
+  <div class="counters">
+    <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span></div>
+    <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span></div>
+  </div>
 
-<div class="counters">
-  <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span></div>
-  <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span></div>
-</div>
+  <script>
+    // Inicializar Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAuq6Dm4P989aa_63PFcCYHPVpsF7gnpiA",
+      authDomain: "reto-calendario.firebaseapp.com",
+      projectId: "reto-calendario",
+      storageBucket: "reto-calendario.appspot.com",
+      messagingSenderId: "1012712540953",
+      appId: "1:1012712540953:web:c329e1b5f002a6a7e2d388",
+      measurementId: "G-928B2T1JRG"
+    };
 
-<script type="module">
-  // Import Firebase (usando ES Modules)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-  import { getDatabase, ref, get, set, remove, child, onValue } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js";
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
 
-  // Configuración Firebase
-  const firebaseConfig = {
-    apiKey: "AIzaSyAuq6Dm4P989aa_63PFcCYHPVpsF7gnpiA",
-    authDomain: "reto-calendario.firebaseapp.com",
-    projectId: "reto-calendario",
-    storageBucket: "reto-calendario.appspot.com",
-    messagingSenderId: "1012712540953",
-    appId: "1:1012712540953:web:c329e1b5f002a6a7e2d388",
-    measurementId: "G-928B2T1JRG"
-  };
+    const months = [
+      { name: "Octubre", days: 31 },
+      { name: "Noviembre", days: 30 },
+      { name: "Diciembre", days: 31 }
+    ];
+    let currentMonth = 0;
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+    const calendar = document.getElementById("calendar");
+    const monthName = document.getElementById("monthName");
 
-  const months = [
-    { name: "Octubre", days: 31 },
-    { name: "Noviembre", days: 30 },
-    { name: "Diciembre", days: 31 }
-  ];
-  let currentMonth = 0;
+    function renderCalendar() {
+      monthName.textContent = months[currentMonth].name;
+      calendar.innerHTML = "";
 
-  const calendar = document.getElementById('calendar');
-  const monthName = document.getElementById('monthName');
+      for (let d = 1; d <= months[currentMonth].days; d++) {
+        const div = document.createElement("div");
+        div.className = "day";
+        div.innerHTML = `
+          <div class="day-number">${d}</div>
+          <div class="row-label">💙 Servel</div>
+          <div class="icons" data-person="b" data-day="${d}">
+            <span data-type="exercise">🏃‍♂️</span>
+            <span data-type="food">🍽️</span>
+            <span data-type="water">💧</span>
+          </div>
+          <div class="row-label">💖 Carmen</div>
+          <div class="icons" data-person="g" data-day="${d}">
+            <span data-type="exercise">🏃‍♀️</span>
+            <span data-type="food">🍽️</span>
+            <span data-type="water">💧</span>
+          </div>
+        `;
+        calendar.appendChild(div);
+      }
 
-  function renderCalendar() {
-    monthName.textContent = months[currentMonth].name;
-    calendar.innerHTML = '';
-    for (let d = 1; d <= months[currentMonth].days; d++) {
-      const div = document.createElement('div');
-      div.className = 'day';
-      div.innerHTML = `
-        <div class="day-number">${d}</div>
-        <div class="row-label">💙 Benito</div>
-        <div class="icons" data-person="b" data-day="${d}">
-          <span data-type="exercise">🏃‍♂️</span>
-          <span data-type="food">🍽️</span>
-          <span data-type="water">💧</span>
-        </div>
-        <div class="row-label">💖 Ella</div>
-        <div class="icons" data-person="g" data-day="${d}">
-          <span data-type="exercise">🏃‍♀️</span>
-          <span data-type="food">🍽️</span>
-          <span data-type="water">💧</span>
-        </div>`;
-      calendar.appendChild(div);
+      loadProgress();
+      addClickHandlers();
     }
-    loadProgress();
-    addClickHandlers();
-  }
 
-  function addClickHandlers() {
-    calendar.querySelectorAll('.icons span').forEach(icon => {
-      icon.addEventListener('click', async () => {
+    function addClickHandlers() {
+      calendar.querySelectorAll(".icons span").forEach((icon) => {
+        icon.addEventListener("click", async () => {
+          const parent = icon.parentElement;
+          const person = parent.dataset.person;
+          const day = parent.dataset.day;
+          const type = icon.dataset.type;
+          const colorClass = person === "b" ? "active-blue" : "active-pink";
+          const path = `users/${months[currentMonth].name}/${person}/days/${day}/${type}`;
+          const refPath = db.ref(path);
+
+          const snapshot = await refPath.get();
+          const isActive = snapshot.exists() && snapshot.val().active;
+
+          if (isActive) {
+            icon.classList.remove(colorClass);
+            refPath.remove();
+          } else {
+            icon.classList.add(colorClass);
+            refPath.set({ active: true });
+          }
+
+          updateCounters();
+        });
+      });
+    }
+
+    function loadProgress() {
+      calendar.querySelectorAll(".icons span").forEach(async (icon) => {
         const parent = icon.parentElement;
         const person = parent.dataset.person;
         const day = parent.dataset.day;
         const type = icon.dataset.type;
-        const colorClass = person === 'b' ? 'active-blue' : 'active-pink';
-        const keyPath = `users/${months[currentMonth].name}/${person}/days/${day}/${type}`;
-        const iconRef = ref(db, keyPath);
+        const colorClass = person === "b" ? "active-blue" : "active-pink";
+        const path = `users/${months[currentMonth].name}/${person}/days/${day}/${type}`;
+        const refPath = db.ref(path);
 
-        const snapshot = await get(iconRef);
-        const isActive = snapshot.exists() && snapshot.val().active;
-
-        if (isActive) {
-          icon.classList.remove(colorClass);
-          await remove(iconRef);
-        } else {
+        const snapshot = await refPath.get();
+        if (snapshot.exists() && snapshot.val().active) {
           icon.classList.add(colorClass);
-          await set(iconRef, { active: true });
         }
-
-        updateCounters();
       });
+
+      updateCounters();
+    }
+
+    async function updateCounters() {
+      const counters = {
+        b: { exercise: 0, food: 0, water: 0 },
+        g: { exercise: 0, food: 0, water: 0 },
+      };
+
+      for (const person of ["b", "g"]) {
+        const refPath = db.ref(`users/${months[currentMonth].name}/${person}/days`);
+        const snapshot = await refPath.get();
+        if (snapshot.exists()) {
+          snapshot.forEach((daySnap) => {
+            daySnap.forEach((typeSnap) => {
+              if (typeSnap.val().active) {
+                counters[person][typeSnap.key]++;
+              }
+            });
+          });
+        }
+      }
+
+      document.getElementById("b-ex").textContent = counters.b.exercise;
+      document.getElementById("b-food").textContent = counters.b.food;
+      document.getElementById("b-water").textContent = counters.b.water;
+      document.getElementById("g-ex").textContent = counters.g.exercise;
+      document.getElementById("g-food").textContent = counters.g.food;
+      document.getElementById("g-water").textContent = counters.g.water;
+    }
+
+    document.getElementById("prev").addEventListener("click", () => {
+      if (currentMonth > 0) currentMonth--;
+      renderCalendar();
     });
-  }
 
-  async function updateCounters() {
-    const bPath = ref(db, `users/${months[currentMonth].name}/b/days`);
-    const gPath = ref(db, `users/${months[currentMonth].name}/g/days`);
-    const counters = {
-      b: { exercise: 0, food: 0, water: 0 },
-      g: { exercise: 0, food: 0, water: 0 }
-    };
+    document.getElementById("next").addEventListener("click", () => {
+      if (currentMonth < months.length - 1) currentMonth++;
+      renderCalendar();
+    });
 
-    const [bSnap, gSnap] = await Promise.all([get(bPath), get(gPath)]);
-
-    if (bSnap.exists()) {
-      bSnap.forEach(day => {
-        day.forEach(type => {
-          if (type.val().active) {
-            counters.b[type.key]++;
-          }
-        });
-      });
-    }
-
-    if (gSnap.exists()) {
-      gSnap.forEach(day => {
-        day.forEach(type => {
-          if (type.val().active) {
-            counters.g[type.key]++;
-          }
-        });
-      });
-    }
-
-    document.getElementById('b-ex').textContent = counters.b.exercise;
-    document.getElementById('b-food').textContent = counters.b.food;
-    document.getElementById('b-water').textContent = counters.b.water;
-
-    document.getElementById('g-ex').textContent = counters.g.exercise;
-    document.getElementById('
+    renderCalendar();
+  </script>
+</body>
+</html>
