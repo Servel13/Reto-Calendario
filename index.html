@@ -250,6 +250,34 @@
     });
 
     renderCalendar();
+
+<!-- Mensaje de felicitación -->
+<div id="felicitacion" style="
+  display:none;
+  background-color:#ffe6f2;
+  color:#d63384;
+  font-weight:bold;
+  padding:12px;
+  border-radius:10px;
+  margin:15px auto;
+  max-width:500px;
+  box-shadow:0 0 10px rgba(255,105,180,0.4);
+  animation:fadeIn 0.8s;
+">
+  🎉 ¡Felicidades Carmen! Vas por buen camino 💖
+</div>
+    
+    // ✅ Verificar si Carmen alcanzó los 20 puntos
+const totalCarmen = counters.g.exercise + counters.g.food + counters.g.water;
+const mensaje = document.getElementById("felicitacion");
+
+if (totalCarmen >= 20) {
+  mensaje.style.display = "block";
+} else {
+  mensaje.style.display = "none";
+}
+    
   </script>
 </body>
 </html>
+
