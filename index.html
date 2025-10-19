@@ -243,17 +243,17 @@
   const messagesShownKey = `messagesShown-${months[currentMonth].name}`;
   const shown = JSON.parse(localStorage.getItem(messagesShownKey)) || {};
 
-  if (counters.g.water === 20 && !shown.water) {
+  if (counters.g.water === 15 && !shown.water) {
     alert("💧 Ya eres 70% agua y 100% mi debilidad");
     shown.water = true;
   }
 
-  if (counters.g.food === 20 && !shown.food) {
+  if (counters.g.food === 15 && !shown.food) {
     alert("🍽️ Comes mejor y yo me derrito más");
     shown.food = true;
   }
 
-  if (counters.g.exercise === 20 && !shown.exercise) {
+  if (counters.g.exercise === 15 && !shown.exercise) {
     alert("🏃‍♀️ Sigue dándole, que tu esfuerzo te hace brillar, y a mí me encanta verte así.");
     shown.exercise = true;
   }
@@ -276,5 +276,6 @@
   </script>
 </body>
 </html>
+
 
 
