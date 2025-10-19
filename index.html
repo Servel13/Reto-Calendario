@@ -212,32 +212,55 @@
     }
 
     async function updateCounters() {
-      const counters = {
-        b: { exercise: 0, food: 0, water: 0 },
-        g: { exercise: 0, food: 0, water: 0 },
-      };
+  const counters = {
+    b: { exercise: 0, food: 0, water: 0 },
+    g: { exercise: 0, food: 0, water: 0 },
+  };
 
-      for (const person of ["b", "g"]) {
-        const refPath = db.ref(`users/${months[currentMonth].name}/${person}/days`);
-        const snapshot = await refPath.get();
-        if (snapshot.exists()) {
-          snapshot.forEach((daySnap) => {
-            daySnap.forEach((typeSnap) => {
-              if (typeSnap.val().active) {
-                counters[person][typeSnap.key]++;
-              }
-            });
-          });
-        }
-      }
-
-      document.getElementById("b-ex").textContent = counters.b.exercise;
-      document.getElementById("b-food").textContent = counters.b.food;
-      document.getElementById("b-water").textContent = counters.b.water;
-      document.getElementById("g-ex").textContent = counters.g.exercise;
-      document.getElementById("g-food").textContent = counters.g.food;
-      document.getElementById("g-water").textContent = counters.g.water;
+  for (const person of ["b", "g"]) {
+    const refPath = db.ref(`users/${months[currentMonth].name}/${person}/days`);
+    const snapshot = await refPath.get();
+    if (snapshot.exists()) {
+      snapshot.forEach((daySnap) => {
+        daySnap.forEach((typeSnap) => {
+          if (typeSnap.val().active) {
+            counters[person][typeSnap.key]++;
+          }
+        });
+      });
     }
+  }
+
+  // Actualiza contadores en pantalla
+  document.getElementById("b-ex").textContent = counters.b.exercise;
+  document.getElementById("b-food").textContent = counters.b.food;
+  document.getElementById("b-water").textContent = counters.b.water;
+  document.getElementById("g-ex").textContent = counters.g.exercise;
+  document.getElementById("g-food").textContent = counters.g.food;
+  document.getElementById("g-water").textContent = counters.g.water;
+
+  // Mostrar mensajes especiales solo una vez usando localStorage
+  const messagesShownKey = `messagesShown-${months[currentMonth].name}`;
+  const shown = JSON.parse(localStorage.getItem(messagesShownKey)) || {};
+
+  if (counters.g.water === 20 && !shown.water) {
+    alert("💧 Ya eres 70% agua y 100% mi debilidad");
+    shown.water = true;
+  }
+
+  if (counters.g.food === 20 && !shown.food) {
+    alert("🍽️ Comes mejor y yo me derrito más");
+    shown.food = true;
+  }
+
+  if (counters.g.exercise === 20 && !shown.exercise) {
+    alert("🏃‍♀️ Sigue dándole, que tu esfuerzo te hace brillar, y a mí me encanta verte así.");
+    shown.exercise = true;
+  }
+
+  localStorage.setItem(messagesShownKey, JSON.stringify(shown));
+}
+
 
     document.getElementById("prev").addEventListener("click", () => {
       if (currentMonth > 0) currentMonth--;
@@ -249,35 +272,9 @@
       renderCalendar();
     });
 
-    renderCalendar();
-
-<!-- Mensaje de felicitación -->
-<div id="felicitacion" style="
-  display:none;
-  background-color:#ffe6f2;
-  color:#d63384;
-  font-weight:bold;
-  padding:12px;
-  border-radius:10px;
-  margin:15px auto;
-  max-width:500px;
-  box-shadow:0 0 10px rgba(255,105,180,0.4);
-  animation:fadeIn 0.8s;
-">
-  🎉 ¡Felicidades Carmen! Vas por buen camino 💖
-</div>
-    
-    // ✅ Verificar si Carmen alcanzó los 20 puntos
-const totalCarmen = counters.g.exercise + counters.g.food + counters.g.water;
-const mensaje = document.getElementById("felicitacion");
-
-if (totalCarmen >= 20) {
-  mensaje.style.display = "block";
-} else {
-  mensaje.style.display = "none";
-}
-    
+    renderCalendar();    
   </script>
 </body>
 </html>
+
 
