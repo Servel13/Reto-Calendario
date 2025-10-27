@@ -240,16 +240,26 @@
   document.getElementById("g-water").textContent = counters.g.water;
 
   // Mostrar mensajes especiales solo una vez usando localStorage
-  if (counters.g.water === 15) {
-  alert("💧 Ya eres 70% agua y 100% mi debilidad");
-}
-if (counters.g.food === 15) {
-  alert("🍽️ Comes mejor y yo me derrito más");
-}
-if (counters.g.exercise === 15) {
-  alert("🏃‍♀️ Sigue dándole, que tu esfuerzo te hace brillar, y a mí me encanta verte así.");
-}
+  const messagesShownKey = `messagesShown-${months[currentMonth].name}`;
+  const shown = JSON.parse(localStorage.getItem(messagesShownKey)) || {};
 
+  if (counters.g.water === 15 && !shown.water) {
+    alert("💧 Ya eres 70% agua y 100% mi debilidad");
+    shown.water = true;
+  }
+
+  if (counters.g.food === 15 && !shown.food) {
+    alert("🍽️ Comes mejor y yo me derrito más");
+    shown.food = true;
+  }
+
+  if (counters.g.exercise === 15 && !shown.exercise) {
+    alert("🏃‍♀️ Sigue dándole, que tu esfuerzo te hace brillar, y a mí me encanta verte así.");
+    shown.exercise = true;
+  }
+
+  localStorage.setItem(messagesShownKey, JSON.stringify(shown));
+}
 
     document.getElementById("prev").addEventListener("click", () => {
       if (currentMonth > 0) currentMonth--;
@@ -265,6 +275,7 @@ if (counters.g.exercise === 15) {
   </script>
 </body>
 </html>
+
 
 
 
