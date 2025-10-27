@@ -256,7 +256,7 @@ if (counters.g.exercise >= 15 && prevCounts.g.exercise < 15) {
 
 // Guardar los valores actuales como referencia
 localStorage.setItem(prevCountsKey, JSON.stringify(counters));
-
+    }
 
     document.getElementById("prev").addEventListener("click", () => {
       if (currentMonth > 0) currentMonth--;
@@ -272,6 +272,7 @@ localStorage.setItem(prevCountsKey, JSON.stringify(counters));
   </script>
 </body>
 </html>
+
 
 
 
