@@ -151,8 +151,8 @@ body.dark #toggleDark {
   <div id="calendar" class="calendar"></div>
 
   <div class="counters">
-    <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span></div>
-    <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span></div>
+    <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span> | <span data-type="soda">🥤</span></div>
+    <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span> | <span data-type="soda">🥤</span></div>
   </div>
 
   <script>
@@ -257,8 +257,8 @@ body.dark #toggleDark {
 
     async function updateCounters() {
   const counters = {
-    b: { exercise: 0, food: 0, water: 0 },
-    g: { exercise: 0, food: 0, water: 0 },
+    b: { exercise: 0, food: 0, water: 0, soda: 0 },
+    g: { exercise: 0, food: 0, water: 0, soda: 0 },
   };
 
   for (const person of ["b", "g"]) {
@@ -282,6 +282,8 @@ body.dark #toggleDark {
   document.getElementById("g-ex").textContent = counters.g.exercise;
   document.getElementById("g-food").textContent = counters.g.food;
   document.getElementById("g-water").textContent = counters.g.water;
+  document.getElementById("b-soda").textContent = counters.b.soda;
+  document.getElementById("g-soda").textContent = counters.g.soda;
 
   // Mostrar mensajes especiales solo una vez usando localStorage
   const prevCountsKey = `prevCounts-${months[currentMonth].name}`;
@@ -334,6 +336,7 @@ toggleBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
