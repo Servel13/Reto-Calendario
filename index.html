@@ -287,20 +287,20 @@ body.dark #toggleDark {
   const prevCountsKey = `prevCounts-${months[currentMonth].name}`;
   const prevCounts = JSON.parse(localStorage.getItem(prevCountsKey)) || { g: { food: 0, water: 0, exercise: 0 } };
 
-/* Mensajes cuando sube a 15
-if (counters.g.water >= 15 && prevCounts.g.water < 15) {
-  alert("💧 Ya eres 70% agua y 100% mi debilidad");
-}
-if (counters.g.food >= 15 && prevCounts.g.food < 15) {
-  alert("🍽️ No solo estás comiendo mejor, estás siendo tu mejor versión");
-}
-if (counters.g.exercise >= 15 && prevCounts.g.exercise < 15) {
-  alert("🏃‍♀️ Sigue dándole, que tu esfuerzo te hace brillar, y a mí me encanta verte así.");
-}
+// Mensajes cuando sube a 15
+//if (counters.g.water >= 15 && prevCounts.g.water < 15) {
+  //alert("💧 Ya eres 70% agua y 100% mi debilidad");
+//}
+//if (counters.g.food >= 15 && prevCounts.g.food < 15) {
+  //alert("🍽️ No solo estás comiendo mejor, estás siendo tu mejor versión");
+//}
+//if (counters.g.exercise >= 15 && prevCounts.g.exercise < 15) {
+ // alert("🏃‍♀️ Sigue dándole, que tu esfuerzo te hace brillar, y a mí me encanta verte así.");
+//}
 
 // Guardar los valores actuales como referencia
-localStorage.setItem(prevCountsKey, JSON.stringify(counters));
-    }*/
+//localStorage.setItem(prevCountsKey, JSON.stringify(counters));
+   // }
 
     document.getElementById("prev").addEventListener("click", () => {
       if (currentMonth > 0) currentMonth--;
@@ -334,6 +334,7 @@ toggleBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
