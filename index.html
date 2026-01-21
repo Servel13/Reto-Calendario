@@ -86,8 +86,9 @@ body.dark #toggleDark {
       display: flex;
       justify-content: center;
       gap: 6px;
-      font-size: 22px;
+      font-size: 20px;   /* un poco más chico */
       margin-top: 4px;
+      flex-wrap: wrap;  /* 🔑 permite que bajen de línea si no caben */
     }
     .row-label {
       font-size: 10px;
@@ -336,6 +337,7 @@ toggleBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
