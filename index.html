@@ -86,9 +86,8 @@ body.dark #toggleDark {
       display: flex;
       justify-content: center;
       gap: 6px;
-      font-size: 20px;   /* un poco más chico */
+      font-size: 22px;
       margin-top: 4px;
-      flex-wrap: wrap;  /* 🔑 permite que bajen de línea si no caben */
     }
     .row-label {
       font-size: 10px;
@@ -152,8 +151,8 @@ body.dark #toggleDark {
   <div id="calendar" class="calendar"></div>
 
   <div class="counters">
-    <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span> | <span data-type="soda">🥤</span></div>
-    <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span> | <span data-type="soda">🥤</span></div>
+    <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span> | 🥤 <span id="b-soda">0</span></div> 
+    <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span> | 🥤 <span id="g-soda">0</span></div>
   </div>
 
   <script>
@@ -195,12 +194,14 @@ body.dark #toggleDark {
             <span data-type="exercise">🏃‍♂️</span>
             <span data-type="food">🍽️</span>
             <span data-type="water">💧</span>
+            <span data-type="soda">🥤</span>
           </div>
           <div class="row-label">💖 Carmen</div>
           <div class="icons" data-person="g" data-day="${d}">
             <span data-type="exercise">🏃‍♀️</span>
             <span data-type="food">🍽️</span>
             <span data-type="water">💧</span>
+            <span data-type="soda">🥤</span>
           </div>
         `;
         calendar.appendChild(div);
@@ -280,15 +281,15 @@ body.dark #toggleDark {
   document.getElementById("b-ex").textContent = counters.b.exercise;
   document.getElementById("b-food").textContent = counters.b.food;
   document.getElementById("b-water").textContent = counters.b.water;
+  document.getElementById("b-soda").textContent = counters.b.soda;
   document.getElementById("g-ex").textContent = counters.g.exercise;
   document.getElementById("g-food").textContent = counters.g.food;
   document.getElementById("g-water").textContent = counters.g.water;
-  document.getElementById("b-soda").textContent = counters.b.soda;
   document.getElementById("g-soda").textContent = counters.g.soda;
 
   // Mostrar mensajes especiales solo una vez usando localStorage
   const prevCountsKey = `prevCounts-${months[currentMonth].name}`;
-  const prevCounts = JSON.parse(localStorage.getItem(prevCountsKey)) || { g: { food: 0, water: 0, exercise: 0 } };
+  const prevCounts = JSON.parse(localStorage.getItem(prevCountsKey)) || { g: { food: 0, water: 0, exercise: 0, soda: 0 } };
 
 // Mensajes cuando sube a 15
 //if (counters.g.water >= 15 && prevCounts.g.water < 15) {
@@ -337,6 +338,7 @@ toggleBtn.addEventListener("click", () => {
   </script>
 </body>
 </html>
+
 
 
 
