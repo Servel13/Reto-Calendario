@@ -3,227 +3,400 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reto en Pareja 💙💖</title>
+  <title>Nuestro Reto Fitness 💙💖</title>
 
   <!-- Firebase SDK (compatibilidad con navegadores sin módulos) -->
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
   <style>
-    
-    /* MODO OSCURO */
-body.dark {
-  background: #121212;
-  color: #f5f5f5;
-}
+    :root {
+      --bg: #f7f7fb;
+      --card: rgba(255, 255, 255, 0.9);
+      --text: #252535;
+      --muted: #77778a;
+      --border: rgba(132, 132, 160, 0.18);
+      --shadow: 0 14px 35px rgba(36, 36, 60, 0.10);
+      --blue: #2f80ed;
+      --pink: #ec4899;
+      --green: #22c55e;
+      --red: #ef4444;
+    }
 
-body.dark .day {
-  background: #1e1e1e;
-  border-color: #444;
-  box-shadow: 0 0 5px #000;
-}
+    body.dark {
+      --bg: #11131a;
+      --card: rgba(30, 32, 42, 0.92);
+      --text: #f6f6fb;
+      --muted: #aaaabe;
+      --border: rgba(255, 255, 255, 0.12);
+      --shadow: 0 14px 35px rgba(0, 0, 0, 0.35);
+    }
 
-body.dark .counters {
-  background: #1e1e1e;
-  color: #fff;
-  box-shadow: 0 0 8px #000;
-}
+    * { box-sizing: border-box; }
 
-body.dark .month-nav button {
-  background: #222;
-  color: #fff;
-}
-
-body.dark #toggleDark {
-  background: #eee !important;
-  color: #000 !important;
-}
-    
     body {
-      font-family: 'Poppins', sans-serif;
-      background: #fafafa;
-      text-align: center;
       margin: 0;
-      padding: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(47, 128, 237, 0.16), transparent 32%),
+        radial-gradient(circle at top right, rgba(236, 72, 153, 0.15), transparent 30%),
+        var(--bg);
+      color: var(--text);
+      transition: background 0.25s ease, color 0.25s ease;
     }
-    h1 {
-      margin-top: 20px;
+
+    .app {
+      width: min(1120px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 18px 0 34px;
     }
-    .month-nav {
-      margin: 10px 0;
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
     }
-    .month-nav button {
-      padding: 8px 14px;
-      margin: 0 5px;
+
+    .title-card {
+      flex: 1;
+      text-align: left;
+      padding: 18px;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+    }
+
+    .title-card h1 {
+      margin: 0 0 6px;
+      font-size: clamp(24px, 4vw, 38px);
+      line-height: 1.1;
+    }
+
+    .title-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+    }
+
+    .toggle-dark {
+      width: 48px;
+      height: 48px;
       border: none;
-      border-radius: 10px;
-      background: #444;
-      color: #fff;
-      font-size: 16px;
+      border-radius: 16px;
+      background: var(--card);
+      color: var(--text);
+      box-shadow: var(--shadow);
       cursor: pointer;
+      font-size: 20px;
     }
+
+    .month-nav {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 18px 0;
+    }
+
+    .month-nav button,
+    .reset-btn {
+      border: none;
+      border-radius: 14px;
+      padding: 10px 14px;
+      background: #2f3240;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .month-nav button:hover,
+    .reset-btn:hover { transform: translateY(-1px); opacity: 0.92; }
+
+    .month-name {
+      min-width: 180px;
+      padding: 11px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .person-card {
+      padding: 16px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .person-card h2 {
+      margin: 0 0 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 21px;
+    }
+
+    .badge {
+      font-size: 13px;
+      font-weight: 700;
+      padding: 6px 10px;
+      border-radius: 99px;
+      background: rgba(47, 128, 237, 0.12);
+      color: var(--blue);
+    }
+
+    .person-card.pink .badge {
+      background: rgba(236, 72, 153, 0.12);
+      color: var(--pink);
+    }
+
+    .progress-bar {
+      height: 12px;
+      background: rgba(128, 128, 150, 0.16);
+      border-radius: 99px;
+      overflow: hidden;
+      margin: 12px 0 12px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--blue), #67a8ff);
+      transition: width 0.35s ease;
+    }
+
+    .person-card.pink .progress-fill {
+      background: linear-gradient(90deg, var(--pink), #fb8cc6);
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 7px;
+    }
+
+    .stat {
+      padding: 9px 6px;
+      border-radius: 14px;
+      background: rgba(128, 128, 150, 0.10);
+      text-align: center;
+      font-size: 13px;
+    }
+
+    .stat b {
+      display: block;
+      margin-top: 3px;
+      font-size: 17px;
+    }
+
     .calendar {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      max-width: 900px;
-      margin: 20px auto;
+      gap: 10px;
+    }
+
+    .weekday {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      text-align: center;
+      padding: 3px 0;
+    }
+
+    .day {
+      min-height: 170px;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
       gap: 8px;
     }
-    .day {
-  border: 1px solid #ccc;
-  border-radius: 14px;
-  padding: 10px 6px;
-  background: white;
-  min-height: 110px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-}
+    .day.empty {
+      visibility: hidden;
+      box-shadow: none;
+    }
+
+    .day.completed-b { outline: 2px solid rgba(47, 128, 237, 0.25); }
+    .day.completed-g { outline: 2px solid rgba(236, 72, 153, 0.25); }
+
     .day-number {
-  font-size: 12px;
-  color: #999;
-  text-align: right;
-  padding-right: 6px;
-}
-    .icons {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
-  font-size: 22px;
-  margin: 6px 0;
-  flex-wrap: wrap;
-}
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 900;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .today-pill {
+      display: none;
+      padding: 3px 7px;
+      border-radius: 99px;
+      background: rgba(34, 197, 94, 0.14);
+      color: var(--green);
+      font-size: 11px;
+    }
+
+    .day.today .today-pill { display: inline-block; }
+
+    .person-row {
+      border-radius: 16px;
+      padding: 7px;
+      background: rgba(128, 128, 150, 0.08);
+    }
+
     .row-label {
-  font-size: 11px;
-  color: #aaa;
-  margin-top: 4px;
-}
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .done-label { opacity: 0; color: var(--green); transition: opacity 0.2s ease; }
+    .person-row.done .done-label { opacity: 1; }
+
+    .icons {
+      display: flex;
+      justify-content: space-between;
+      gap: 4px;
+      font-size: 20px;
+    }
+
     .icons span {
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.2s ease;
-  border-radius: 50%;
-  padding: 5px;
-}
-    .icons span:hover {
-  transform: scale(1.25);
-}
-    .active-blue {
-  background-color: rgba(0, 120, 255, 0.25);
-  box-shadow: 0 0 10px rgba(0, 120, 255, 0.7);
-}
-    
-.active-pink {
-  background-color: rgba(255, 20, 147, 0.25);
-  box-shadow: 0 0 10px rgba(255, 20, 147, 0.7);
-}
-    .active-soda {
-  background-color: rgba(255, 60, 60, 0.3);
-  box-shadow: 0 0 10px rgba(255, 60, 60, 0.7);
-}
-    .counters {
-      margin: 20px auto;
-      max-width: 600px;
-      background: white;
-      padding: 15px;
-      border-radius: 15px;
-      box-shadow: 0 0 10px #ccc;
-    }
-    .counters div {
-      margin: 5px 0;
-      font-size: 16px;
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.2s ease, background 0.2s ease;
+      user-select: none;
     }
 
-    /* 📱 VISTA MÓVIL */
-@media (max-width: 600px) {
+    .icons span:hover { transform: scale(1.18); }
+    .icons span:active { transform: scale(0.95); }
 
-  h1 {
-    font-size: 20px;
-    margin: 12px 0;
-  }
+    .active-blue { background: rgba(47, 128, 237, 0.20); box-shadow: 0 0 0 3px rgba(47, 128, 237, 0.18); }
+    .active-pink { background: rgba(236, 72, 153, 0.20); box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.18); }
+    .active-soda { background: rgba(239, 68, 68, 0.18); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.16); }
 
-  .month-nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-  }
+    .note-btn {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 6px;
+      font-size: 12px;
+    }
 
-  .month-nav button {
-    padding: 6px 10px;
-    font-size: 14px;
-  }
+    .note-btn.has-note {
+      color: var(--text);
+      background: rgba(255, 193, 7, 0.14);
+    }
 
-  .calendar {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-    padding: 0 10px;
-  }
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 18px;
+    }
 
-  .day {
-    min-height: 140px;
-    padding: 10px 6px;
-  }
+    .reset-btn { background: var(--red); }
 
-  .day-number {
-    font-size: 13px;
-  }
+    @media (max-width: 820px) {
+      .summary-grid { grid-template-columns: 1fr; }
+      .calendar { grid-template-columns: repeat(2, 1fr); }
+      .weekday { display: none; }
+      .day.empty { display: none; }
+      .stats { grid-template-columns: repeat(5, minmax(50px, 1fr)); }
+    }
 
-  .row-label {
-    font-size: 10px;
-    margin-top: 6px;
-  }
-
-  .icons {
-    font-size: 24px;
-    gap: 12px;
-    margin: 8px 0;
-  }
-
-  .icons span {
-    padding: 6px;
-  }
-
-  .counters {
-    font-size: 14px;
-    margin: 15px 10px;
-  }
-
-}
+    @media (max-width: 470px) {
+      .app { width: min(100% - 14px, 1120px); padding-top: 10px; }
+      .topbar { align-items: stretch; }
+      .title-card { padding: 14px; border-radius: 20px; }
+      .toggle-dark { width: 44px; height: 44px; }
+      .calendar { grid-template-columns: 1fr; }
+      .day { min-height: auto; }
+      .stats { grid-template-columns: repeat(3, 1fr); }
+      .month-name { min-width: 140px; }
+    }
   </style>
 </head>
 <body>
+  <main class="app">
+    <section class="topbar">
+      <div class="title-card">
+        <h1>Nuestro Reto Fitness 💙💖</h1>
+        <p>Marquen ejercicio, comida, agua y soda. El objetivo es motivarse, no castigarse.</p>
+      </div>
+      <button id="toggleDark" class="toggle-dark" title="Cambiar modo">🌙</button>
+    </section>
 
-  <button id="toggleDark" style="
-  position: fixed; 
-  top: 10px; 
-  right: 10px; 
-  padding: 8px 12px; 
-  border-radius: 10px;
-  border: none;
-  background: #333;
-  color: white;
-  cursor: pointer;
-">
-🌙
-</button>
-  
-  <h1>💪 Reto en Pareja — Junio / Julio / Agosto</h1>
+    <section class="month-nav">
+      <button id="prev">⬅️</button>
+      <span id="monthName" class="month-name"></span>
+      <button id="next">➡️</button>
+    </section>
 
-  <div class="month-nav">
-    <button id="prev">⬅️</button>
-    <span id="monthName" style="font-weight:bold; font-size:18px;"></span>
-    <button id="next">➡️</button>
-  </div>
+    <section class="summary-grid">
+      <article class="person-card blue">
+        <h2>💙 Servel <span id="b-percent" class="badge">0%</span></h2>
+        <div class="progress-bar"><div id="b-progress" class="progress-fill"></div></div>
+        <div class="stats">
+          <div class="stat">🏃‍♂️<b id="b-ex">0</b></div>
+          <div class="stat">🍽️<b id="b-food">0</b></div>
+          <div class="stat">💧<b id="b-water">0</b></div>
+          <div class="stat">🥤<b id="b-soda">0</b></div>
+          <div class="stat">🔥 Racha<b id="b-streak">0</b></div>
+        </div>
+      </article>
 
-  <div id="calendar" class="calendar"></div>
+      <article class="person-card pink">
+        <h2>💖 Carmen <span id="g-percent" class="badge">0%</span></h2>
+        <div class="progress-bar"><div id="g-progress" class="progress-fill"></div></div>
+        <div class="stats">
+          <div class="stat">🏃‍♀️<b id="g-ex">0</b></div>
+          <div class="stat">🍽️<b id="g-food">0</b></div>
+          <div class="stat">💧<b id="g-water">0</b></div>
+          <div class="stat">🥤<b id="g-soda">0</b></div>
+          <div class="stat">🔥 Racha<b id="g-streak">0</b></div>
+        </div>
+      </article>
+    </section>
 
-  <div class="counters">
-    <div>💙 <b>Servel</b> — 🏃‍♂️ <span id="b-ex">0</span> | 🍽️ <span id="b-food">0</span> | 💧 <span id="b-water">0</span> | 🥤 <span id="b-soda">0</span></div> 
-    <div>💖 <b>Carmen</b> — 🏃‍♀️ <span id="g-ex">0</span> | 🍽️ <span id="g-food">0</span> | 💧 <span id="g-water">0</span> | 🥤 <span id="g-soda">0</span></div>
-  </div>
+    <section id="calendar" class="calendar"></section>
+
+    <div class="footer-actions">
+      <button id="resetMonth" class="reset-btn">🗑️ Reiniciar mes</button>
+    </div>
+  </main>
 
   <script>
     // Inicializar Firebase
@@ -240,46 +413,95 @@ body.dark #toggleDark {
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    const months = [
-      { name: "Junio", days: 30 },
-      { name: "Julio", days: 31 },
-      { name: "Agosto", days: 31 }
-      //{ name: "Diciembre", days: 31 }
-    ];
-    let currentMonth = 0;
+    const people = {
+      b: { name: "Servel", colorClass: "active-blue", run: "🏃‍♂️" },
+      g: { name: "Carmen", colorClass: "active-pink", run: "🏃‍♀️" }
+    };
+
+    const habits = ["exercise", "food", "water", "soda"];
+    const habitIcons = { exercise: "🏃", food: "🍽️", water: "💧", soda: "🥤" };
+    const weekdays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+    const monthNames = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+
+    const today = new Date();
+    let currentYear = today.getFullYear();
+    let currentMonth = today.getMonth();
 
     const calendar = document.getElementById("calendar");
     const monthName = document.getElementById("monthName");
 
+    function monthKey() {
+      return `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`;
+    }
+
+    function daysInMonth() {
+      return new Date(currentYear, currentMonth + 1, 0).getDate();
+    }
+
+    function firstWeekday() {
+      return new Date(currentYear, currentMonth, 1).getDay();
+    }
+
     function renderCalendar() {
-      monthName.textContent = months[currentMonth].name;
+      monthName.textContent = `${monthNames[currentMonth]} ${currentYear}`;
       calendar.innerHTML = "";
 
-      for (let d = 1; d <= months[currentMonth].days; d++) {
+      weekdays.forEach((day) => {
+        const label = document.createElement("div");
+        label.className = "weekday";
+        label.textContent = day;
+        calendar.appendChild(label);
+      });
+
+      for (let i = 0; i < firstWeekday(); i++) {
+        const empty = document.createElement("div");
+        empty.className = "day empty";
+        calendar.appendChild(empty);
+      }
+
+      for (let d = 1; d <= daysInMonth(); d++) {
         const div = document.createElement("div");
-        div.className = "day";
+        const isToday = d === today.getDate() && currentMonth === today.getMonth() && currentYear === today.getFullYear();
+        div.className = `day ${isToday ? "today" : ""}`;
+        div.dataset.day = d;
         div.innerHTML = `
-          <div class="day-number">${d}</div>
-          <div class="row-label">💙 Servel</div>
-          <div class="icons" data-person="b" data-day="${d}">
-            <span data-type="exercise">🏃‍♂️</span>
-            <span data-type="food">🍽️</span>
-            <span data-type="water">💧</span>
-            <span data-type="soda">🥤</span>
-          </div>
-          <div class="row-label">💖 Carmen</div>
-          <div class="icons" data-person="g" data-day="${d}">
-            <span data-type="exercise">🏃‍♀️</span>
-            <span data-type="food">🍽️</span>
-            <span data-type="water">💧</span>
-            <span data-type="soda">🥤</span>
-          </div>
+          <div class="day-number"><span>Día ${d}</span><span class="today-pill">Hoy</span></div>
+          ${personTemplate("b", d)}
+          ${personTemplate("g", d)}
         `;
         calendar.appendChild(div);
       }
 
       loadProgress();
       addClickHandlers();
+    }
+
+    function personTemplate(person, day) {
+      const p = people[person];
+      return `
+        <div class="person-row" data-row-person="${person}" data-row-day="${day}">
+          <div class="row-label"><span>${person === "b" ? "💙" : "💖"} ${p.name}</span><span class="done-label">Completo ✅</span></div>
+          <div class="icons" data-person="${person}" data-day="${day}">
+            <span title="Ejercicio" data-type="exercise">${p.run}</span>
+            <span title="Comida" data-type="food">🍽️</span>
+            <span title="Agua" data-type="water">💧</span>
+            <span title="Soda" data-type="soda">🥤</span>
+          </div>
+          <button class="note-btn" data-note-person="${person}" data-note-day="${day}">📝 Nota</button>
+        </div>
+      `;
+    }
+
+    function habitPath(person, day, type) {
+      return `users/${monthKey()}/${person}/days/${day}/${type}`;
+    }
+
+    function notePath(person, day) {
+      return `users/${monthKey()}/${person}/days/${day}/note`;
+    }
+
+    function monthPath() {
+      return `users/${monthKey()}`;
     }
 
     function addClickHandlers() {
@@ -289,128 +511,159 @@ body.dark #toggleDark {
           const person = parent.dataset.person;
           const day = parent.dataset.day;
           const type = icon.dataset.type;
-          const colorClass = person === "b" ? "active-blue" : "active-pink";
-          const path = `users/${months[currentMonth].name}/${person}/days/${day}/${type}`;
-          const refPath = db.ref(path);
-
+          const colorClass = type === "soda" ? "active-soda" : people[person].colorClass;
+          const refPath = db.ref(habitPath(person, day, type));
           const snapshot = await refPath.get();
           const isActive = snapshot.exists() && snapshot.val().active;
 
           if (isActive) {
             icon.classList.remove(colorClass);
-            refPath.remove();
+            await refPath.remove();
           } else {
             icon.classList.add(colorClass);
-            refPath.set({ active: true });
+            await refPath.set({ active: true, updatedAt: new Date().toISOString() });
           }
 
           updateCounters();
         });
       });
-    }
 
-    function loadProgress() {
-      calendar.querySelectorAll(".icons span").forEach(async (icon) => {
-        const parent = icon.parentElement;
-        const person = parent.dataset.person;
-        const day = parent.dataset.day;
-        const type = icon.dataset.type;
-        const colorClass = person === "b" ? "active-blue" : "active-pink";
-        const path = `users/${months[currentMonth].name}/${person}/days/${day}/${type}`;
-        const refPath = db.ref(path);
+      calendar.querySelectorAll(".note-btn").forEach((btn) => {
+        btn.addEventListener("click", async () => {
+          const person = btn.dataset.notePerson;
+          const day = btn.dataset.noteDay;
+          const refPath = db.ref(notePath(person, day));
+          const snapshot = await refPath.get();
+          const currentNote = snapshot.exists() ? snapshot.val() : "";
+          const newNote = prompt(`Nota para ${people[person].name} - día ${day}:`, currentNote);
 
-        const snapshot = await refPath.get();
-        if (snapshot.exists() && snapshot.val().active) {
-          icon.classList.add(colorClass);
-        }
-      });
-
-      updateCounters();
-    }
-
-    async function updateCounters() {
-  const counters = {
-    b: { exercise: 0, food: 0, water: 0, soda: 0 },
-    g: { exercise: 0, food: 0, water: 0, soda: 0 },
-  };
-
-  for (const person of ["b", "g"]) {
-    const refPath = db.ref(`users/${months[currentMonth].name}/${person}/days`);
-    const snapshot = await refPath.get();
-    if (snapshot.exists()) {
-      snapshot.forEach((daySnap) => {
-        daySnap.forEach((typeSnap) => {
-          if (typeSnap.val().active) {
-            counters[person][typeSnap.key]++;
+          if (newNote === null) return;
+          const cleanNote = newNote.trim();
+          if (cleanNote) {
+            await refPath.set(cleanNote);
+            btn.classList.add("has-note");
+          } else {
+            await refPath.remove();
+            btn.classList.remove("has-note");
           }
         });
       });
     }
-  }
 
-  // Actualiza contadores en pantalla
-  document.getElementById("b-ex").textContent = counters.b.exercise;
-  document.getElementById("b-food").textContent = counters.b.food;
-  document.getElementById("b-water").textContent = counters.b.water;
-  document.getElementById("b-soda").textContent = counters.b.soda;
-  document.getElementById("g-ex").textContent = counters.g.exercise;
-  document.getElementById("g-food").textContent = counters.g.food;
-  document.getElementById("g-water").textContent = counters.g.water;
-  document.getElementById("g-soda").textContent = counters.g.soda;
+    async function loadProgress() {
+      const snapshot = await db.ref(monthPath()).get();
+      const data = snapshot.exists() ? snapshot.val() : {};
 
-  // Mostrar mensajes especiales solo una vez usando localStorage
-  const prevCountsKey = `prevCounts-${months[currentMonth].name}`;
-  const prevCounts = JSON.parse(localStorage.getItem(prevCountsKey)) || { g: { food: 0, water: 0, exercise: 0, soda: 0 } };
+      calendar.querySelectorAll(".icons span").forEach((icon) => {
+        const parent = icon.parentElement;
+        const person = parent.dataset.person;
+        const day = parent.dataset.day;
+        const type = icon.dataset.type;
+        const saved = data?.[person]?.days?.[day]?.[type]?.active;
+        const colorClass = type === "soda" ? "active-soda" : people[person].colorClass;
+        icon.classList.toggle(colorClass, !!saved);
+      });
 
-// Mensajes cuando sube a 15
-//if (counters.g.water >= 15 && prevCounts.g.water < 15) {
-  //alert("💧 Ya eres 70% agua y 100% mi debilidad");
-//}
-//if (counters.g.food >= 15 && prevCounts.g.food < 15) {
-  //alert("🍽️ No solo estás comiendo mejor, estás siendo tu mejor versión");
-//}
-//if (counters.g.exercise >= 15 && prevCounts.g.exercise < 15) {
- // alert("🏃‍♀️ Sigue dándole, que tu esfuerzo te hace brillar, y a mí me encanta verte así.");
-//}
+      calendar.querySelectorAll(".note-btn").forEach((btn) => {
+        const person = btn.dataset.notePerson;
+        const day = btn.dataset.noteDay;
+        const hasNote = !!data?.[person]?.days?.[day]?.note;
+        btn.classList.toggle("has-note", hasNote);
+      });
 
-// Guardar los valores actuales como referencia
-//localStorage.setItem(prevCountsKey, JSON.stringify(counters));
+      updateUIFromData(data);
+    }
+
+    async function updateCounters() {
+      const snapshot = await db.ref(monthPath()).get();
+      const data = snapshot.exists() ? snapshot.val() : {};
+      updateUIFromData(data);
+    }
+
+    function updateUIFromData(data) {
+      for (const person of ["b", "g"]) {
+        const counters = { exercise: 0, food: 0, water: 0, soda: 0 };
+        let completedDays = 0;
+        let currentStreak = 0;
+        let bestStreak = 0;
+
+        for (let day = 1; day <= daysInMonth(); day++) {
+          const dayData = data?.[person]?.days?.[day] || {};
+          habits.forEach((habit) => {
+            if (dayData?.[habit]?.active) counters[habit]++;
+          });
+
+          const done = habits.every((habit) => dayData?.[habit]?.active);
+          const row = document.querySelector(`[data-row-person="${person}"][data-row-day="${day}"]`);
+          if (row) row.classList.toggle("done", done);
+
+          const dayBox = document.querySelector(`.day[data-day="${day}"]`);
+          if (dayBox) dayBox.classList.toggle(person === "b" ? "completed-b" : "completed-g", done);
+
+          if (done) {
+            completedDays++;
+            currentStreak++;
+            bestStreak = Math.max(bestStreak, currentStreak);
+          } else {
+            currentStreak = 0;
+          }
+        }
+
+        const totalGoals = daysInMonth() * habits.length;
+        const totalCompleted = counters.exercise + counters.food + counters.water + counters.soda;
+        const percent = Math.round((totalCompleted / totalGoals) * 100);
+
+        document.getElementById(`${person}-ex`).textContent = counters.exercise;
+        document.getElementById(`${person}-food`).textContent = counters.food;
+        document.getElementById(`${person}-water`).textContent = counters.water;
+        document.getElementById(`${person}-soda`).textContent = counters.soda;
+        document.getElementById(`${person}-streak`).textContent = bestStreak;
+        document.getElementById(`${person}-percent`).textContent = `${percent}%`;
+        document.getElementById(`${person}-progress`).style.width = `${percent}%`;
+      }
     }
 
     document.getElementById("prev").addEventListener("click", () => {
-      if (currentMonth > 0) currentMonth--;
+      currentMonth--;
+      if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+      }
       renderCalendar();
     });
 
     document.getElementById("next").addEventListener("click", () => {
-      if (currentMonth < months.length - 1) currentMonth++;
+      currentMonth++;
+      if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+      }
       renderCalendar();
     });
 
-    // MODO OSCURO
-const toggleBtn = document.getElementById("toggleDark");
+    document.getElementById("resetMonth").addEventListener("click", async () => {
+      const ok = confirm(`¿Seguro que quieres borrar todo ${monthNames[currentMonth]} ${currentYear}?`);
+      if (!ok) return;
+      await db.ref(monthPath()).remove();
+      renderCalendar();
+    });
 
-// Cargar preferencia
-if (localStorage.getItem("darkMode") === "true") {
-  document.body.classList.add("dark");
-  toggleBtn.textContent = "☀️";
-}
+    const toggleBtn = document.getElementById("toggleDark");
+    if (localStorage.getItem("darkMode") === "true") {
+      document.body.classList.add("dark");
+      toggleBtn.textContent = "☀️";
+    }
 
-toggleBtn.addEventListener("click", () => {
-  document.body.classList.toggle("dark");
+    toggleBtn.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      toggleBtn.textContent = isDark ? "☀️" : "🌙";
+      localStorage.setItem("darkMode", isDark);
+    });
 
-  const isDark = document.body.classList.contains("dark");
-  toggleBtn.textContent = isDark ? "☀️" : "🌙";
-
-  localStorage.setItem("darkMode", isDark);
-});
-    
-    renderCalendar();    
+    renderCalendar();
   </script>
 </body>
-</html>
-
-
 
 
 
