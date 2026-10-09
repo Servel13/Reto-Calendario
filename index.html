@@ -511,6 +511,7 @@ h1 {
     font-size:11px
   }
 }
+.day.grace{border-color:#d8b46a;}
 </style>
 </head>
 <body>
@@ -518,8 +519,8 @@ h1 {
   <section class="topbar">
     <div class="hero">
 <div class="eyebrow">Reto compartido · Equipo de 3</div>
-<h1>Reto Fitness 💪</h1>
-<p>Mantengan sus habitos y el ganador tendra un premio</p>
+<h1>Nuestro Reto Fitness 💪</h1>
+<p>Un día a la vez. Registren sus hábitos hoy y mantengan el progreso honesto.</p>
 </div>
     <div class="top-actions">
 <button id="toggleDark" class="icon-btn" title="Cambiar modo claro/oscuro" aria-label="Cambiar tema">🌙</button>
@@ -535,7 +536,7 @@ h1 {
   <div class="notice">
 <span>🔒</span>
 <div>
-<strong>Regla del reto:</strong> solo se puede editar el día actual hasta las 3:59. Al iniciar el siguiente día a las 4:00, el anterior queda bloqueado, las fechas futuras también están bloqueadas.</div>
+<strong>Regla del reto:</strong> solo se puede editar el día actual, hasta las 11:59 p. m. de Sonora. Al iniciar el siguiente día, el anterior queda bloqueado; las fechas futuras también están bloqueadas. Los registros guardados se pueden consultar.</div>
 </div>
   <section id="summary" class="summary-grid">
 </section>
@@ -593,13 +594,11 @@ function sonoraNow(){
 }
 function todayKey(){
     const n = sonoraNow();
-
-    // El día del reto termina a las 4:00 a. m. (hora de Sonora).
-    // Antes de las 4:00 a. m., todavía cuenta como el día anterior.
-    if (n.getHours() < 4) {
-        n.setDate(n.getDate() - 1);
-    }
-
+    return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
+}
+function yesterdayKey(){
+    const n = sonoraNow();
+    n.setDate(n.getDate() - 1);
     return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
 }
 function dateKey(day){
@@ -615,8 +614,10 @@ function firstWeekday(){
     return new Date(currentYear,currentMonth,1).getDay()
 }
 function dayStatus(day){
-    const key=dateKey(day),today=todayKey();
-    return key<today?"past":key>today?"future":"today"
+    const key=dateKey(day),today=todayKey(),yesterday=yesterdayKey();
+    if(key===today) return "today";
+    if(key===yesterday) return "grace";
+    return key<today?"past":"future";
 }
 function editable(day){
     return dayStatus(day)==="today"
@@ -663,9 +664,9 @@ function renderCalendar(){
     }
     for(let d=1;d<=daysInMonth();d++){
         const status=dayStatus(d),el=document.createElement("article");
-        el.className=`day ${status==="today"?"today":"locked"}`;
+        el.className=`day ${status==="today"?"today":status==="grace"?"grace":"locked"}`;
         el.dataset.day=d;
-        const state=status==="today"?"HOY":status==="past"?"🔒 Cerrado":"🔒 Futuro";
+        const state=status==="today"?"HOY":status==="grace"?"Ayer · editable":status==="past"?"🔒 Cerrado":"🔒 Futuro";
         el.innerHTML=`<div class="day-number">
 <span>Día ${d}</span>
 <span class="day-state">${state}</span>
@@ -675,7 +676,7 @@ function renderCalendar(){
     loadProgress()
 }
 function personTemplate(id,day,status){
-    const p=people[id],canEdit=status==="today";
+    const p=people[id],canEdit=status==="today"||status==="grace";
     return `<div class="person-row ${p.color}" data-row-person="${id}" data-row-day="${day}">
 <div class="row-label">
 <span>${p.emoji} ${p.name}</span>
@@ -700,7 +701,7 @@ function personTemplate(id,day,status){
         canEdit?"":"disabled"
     }
     >🥤</button>`}</div>
-<button class="note-btn" data-note-person="${id}" data-note-day="${day}" ${canEdit?"":"disabled"}>📝 Nota</button>${status==="past"?"<div class=\"locked-message\">Día cerrado; solo consulta.</div>":status==="future"?"<div class=\"locked-message\">Se habilita ese día.</div>":""}</div>`
+<button class="note-btn" data-note-person="${id}" data-note-day="${day}" ${canEdit?"":"disabled"}>📝 Nota</button>${status==="past"?"<div class=\"locked-message\">Día cerrado; solo consulta.</div>":status==="future"?"<div class=\"locked-message\">Se habilita ese día.</div>":status==="grace"?"<div class=\"locked-message\">Tienes hasta hoy a las 11:59 p. m. para anotarlo.</div>":""}</div>`
 }
 function habitPath(person,day,type){
     return `users/${monthKey()}/${person}/days/${day}/${type}`
