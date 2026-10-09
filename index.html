@@ -519,7 +519,7 @@ h1 {
     <div class="hero">
 <div class="eyebrow">Reto compartido · Equipo de 3</div>
 <h1>Reto Fitness 💪</h1>
-<p>Mantengan su progreso y el ganador se lleva un premio</p>
+<p>Mantengan sus habitos y el ganador tendra un premio</p>
 </div>
     <div class="top-actions">
 <button id="toggleDark" class="icon-btn" title="Cambiar modo claro/oscuro" aria-label="Cambiar tema">🌙</button>
@@ -535,7 +535,7 @@ h1 {
   <div class="notice">
 <span>🔒</span>
 <div>
-<strong>Regla del reto:</strong> solo se puede editar el día actual, hasta las 11:59 p. m. Al iniciar el siguiente día, el anterior queda bloqueado, las fechas futuras también están bloqueadas.</div>
+<strong>Regla del reto:</strong> solo se puede editar el día actual hasta las 3:59. Al iniciar el siguiente día a las 4:00, el anterior queda bloqueado, las fechas futuras también están bloqueadas.</div>
 </div>
   <section id="summary" class="summary-grid">
 </section>
@@ -592,8 +592,15 @@ function sonoraNow(){
     return new Date(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));
 }
 function todayKey(){
-    const n=sonoraNow();
-    return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`
+    const n = sonoraNow();
+
+    // El día del reto termina a las 4:00 a. m. (hora de Sonora).
+    // Antes de las 4:00 a. m., todavía cuenta como el día anterior.
+    if (n.getHours() < 4) {
+        n.setDate(n.getDate() - 1);
+    }
+
+    return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
 }
 function dateKey(day){
     return `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(day).padStart(2,"0")}`
