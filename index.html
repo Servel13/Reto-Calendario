@@ -683,7 +683,9 @@ function renderCalendar(){
     loadProgress()
 }
 function personTemplate(id,day,status){
-    const p=people[id],canEdit=status==="today"||status==="grace";
+  
+    const p=people[id],canEdit=correctionMode||status==="today"||status==="grace";
+  
     return `<div class="person-row ${p.color}" data-row-person="${id}" data-row-day="${day}">
 <div class="row-label">
 <span>${p.emoji} ${p.name}</span>
