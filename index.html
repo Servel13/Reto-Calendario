@@ -526,7 +526,6 @@ h1 {
 <button id="toggleDark" class="icon-btn" title="Cambiar modo claro/oscuro" aria-label="Cambiar tema">🌙</button>
       
 
-      
 </div>
   </section>
   <section class="month-nav">
@@ -590,10 +589,7 @@ const habits=["exercise","food","water","soda"],monthNames=["Enero","Febrero","M
 let currentMonthDate=sonoraNow();
 let currentYear=currentMonthDate.getFullYear(),currentMonth=currentMonthDate.getMonth();
 const calendar=document.getElementById("calendar"),monthName=document.getElementById("monthName");
-let toastTimer;
-
-  let correctionMode = false;
-  
+let toastTimer;  
 function sonoraNow(){
     const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Hermosillo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date()).reduce((a,p)=>(a[p.type]=p.value,a),{});
     return new Date(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));
@@ -627,7 +623,7 @@ function dayStatus(day){
 }
   function editable(day){
     const status = dayStatus(day);
-    return correctionMode || status === "today" || status === "grace";
+    return status === "today" || status === "grace";
 }
 function toast(message){
     const el=document.getElementById("toast");
@@ -683,9 +679,7 @@ function renderCalendar(){
     loadProgress()
 }
 function personTemplate(id,day,status){
-  
-    const p=people[id],canEdit=correctionMode||status==="today"||status==="grace";
-  
+  const p=people[id],canEdit=status==="today"||status==="grace";
     return `<div class="person-row ${p.color}" data-row-person="${id}" data-row-day="${day}">
 <div class="row-label">
 <span>${p.emoji} ${p.name}</span>
@@ -790,22 +784,6 @@ if(localStorage.getItem("darkMode")==="true"){
     toggleBtn.textContent="☀️"
 }
 toggleBtn.addEventListener("click",()=>{document.body.classList.toggle("dark");const dark=document.body.classList.contains("dark");toggleBtn.textContent=dark?"☀️":"🌙";localStorage.setItem("darkMode",String(dark))});
-
-  
-document.getElementById("toggleCorrection").addEventListener("click", () => {
-    if (!correctionMode) {
-        if (!confirm("¿Activar la corrección de días anteriores y futuros?")) return;
-        correctionMode = true;
-        document.getElementById("toggleCorrection").textContent = "🔒 Terminar corrección";
-        toast("Modo de corrección activado.");
-    } else {
-        correctionMode = false;
-        document.getElementById("toggleCorrection").textContent = "🔓 Corregir días";
-        toast("Días bloqueados nuevamente.");
-    }
-    renderCalendar();
-});
-
   
 renderSummary();
 renderCalendar();
