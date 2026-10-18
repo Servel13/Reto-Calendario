@@ -524,6 +524,9 @@ h1 {
 </div>
     <div class="top-actions">
 <button id="toggleDark" class="icon-btn" title="Cambiar modo claro/oscuro" aria-label="Cambiar tema">🌙</button>
+      
+      <button id="toggleCorrection" class="nav-btn">🔓 Corregir días</button>
+      
 </div>
   </section>
   <section class="month-nav">
@@ -588,6 +591,9 @@ let currentMonthDate=sonoraNow();
 let currentYear=currentMonthDate.getFullYear(),currentMonth=currentMonthDate.getMonth();
 const calendar=document.getElementById("calendar"),monthName=document.getElementById("monthName");
 let toastTimer;
+
+  let correctionMode = false;
+  
 function sonoraNow(){
     const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"America/Hermosillo",year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"}).formatToParts(new Date()).reduce((a,p)=>(a[p.type]=p.value,a),{});
     return new Date(Number(parts.year),Number(parts.month)-1,Number(parts.day),Number(parts.hour),Number(parts.minute),Number(parts.second));
@@ -619,9 +625,9 @@ function dayStatus(day){
     if(key===yesterday) return "grace";
     return key<today?"past":"future";
 }
-function editable(day){
+  function editable(day){
     const status = dayStatus(day);
-    return status === "today" || status === "grace";
+    return correctionMode || status === "today" || status === "grace";
 }
 function toast(message){
     const el=document.getElementById("toast");
@@ -782,6 +788,23 @@ if(localStorage.getItem("darkMode")==="true"){
     toggleBtn.textContent="☀️"
 }
 toggleBtn.addEventListener("click",()=>{document.body.classList.toggle("dark");const dark=document.body.classList.contains("dark");toggleBtn.textContent=dark?"☀️":"🌙";localStorage.setItem("darkMode",String(dark))});
+
+  
+document.getElementById("toggleCorrection").addEventListener("click", () => {
+    if (!correctionMode) {
+        if (!confirm("¿Activar la corrección de días anteriores y futuros?")) return;
+        correctionMode = true;
+        document.getElementById("toggleCorrection").textContent = "🔒 Terminar corrección";
+        toast("Modo de corrección activado.");
+    } else {
+        correctionMode = false;
+        document.getElementById("toggleCorrection").textContent = "🔓 Corregir días";
+        toast("Días bloqueados nuevamente.");
+    }
+    renderCalendar();
+});
+
+  
 renderSummary();
 renderCalendar();
 // Actualiza estados al cambiar el día sin necesitar recargar la página.
